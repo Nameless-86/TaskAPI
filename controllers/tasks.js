@@ -31,12 +31,34 @@ const getTask = async (req, res) => {
   }
 }
 
-const updateTask = (req, res) => {
-  res.send('Update task')
+const updateTask = async (req, res) => {
+  try {
+    const { id: taskId } = req.params;
+    const updateTask = await Task.findOneAndUpdate(
+      { _id: taskId },
+      req.body,
+      { new: true, runValidators: true, });
+    if (!updateTask) {
+      return res.status(404).json({ msg: `No task with following id found: ${taskId}` })
+    }
+    res.status(200).json({ updateTask })
+  } catch (error) {
+    res.status(500).json({ msg: [error.name, error.message] });
+  }
 }
 
-const deleteTask = (req, res) => {
-  res.send('Delete task')
+const deleteTask = async (req, res) => {
+  try {
+    const { id: taskId } = req.params;
+    const deleteTask = await Task.findOneAndDelete({ _id: taskId });
+    if (!deleteTask) {
+      return res.status(404).json({ msg: `No task with following id found: ${taskId}` })
+    }
+    res.status(200).json({ task: null, status: "Task deleted succesfully" })
+  } catch (error) {
+    res.status(500).json({ msg: [error.name, error.message] })
+  }
+
 }
 
 module.exports = {
